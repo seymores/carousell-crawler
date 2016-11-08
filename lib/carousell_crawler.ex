@@ -28,6 +28,34 @@ defmodule CarousellCrawler do
     HTTPotion.get(url, [headers: headers, follow_redirects: true]) |> Map.get(:body) |> Floki.parse
   end
 
+  @doc """
+  Parse Carousell item page using embeded script data used by the page react.js.
+
+  ## Example
+
+      iex> CarousellCrawler.parse_for_script_data "https://carousell.com/p/62538322"
+
+  """
+  def parse_for_script_data(url) do
+    load_body(url)
+    |> parse_script
+    |> parse_context_data
+  end
+
+  defp parse_script(body) do
+    Floki.find(body, "script")
+    |> Enum.at(2)
+    |> elem(2)
+    |> List.first
+  end
+
+  defp parse_context_data(script) do
+    Regex.scan(~r/window.App=(.*);/, script)
+    |> List.first
+    |> List.last
+    |> Poison.decode
+  end
+
   defp attribute_content(body, target) do
     Floki.find(body, target) |> Floki.attribute("content") |> List.first
   end
