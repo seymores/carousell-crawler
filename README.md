@@ -1,16 +1,14 @@
 # CarousellCrawler
 
-**TODO: Add description**
+Experimental Carousell crawler, because there is no API to get their data.
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
 
   1. Add `carousell_crawler` to your list of dependencies in `mix.exs`:
 
     ```elixir
     def deps do
-      [{:carousell_crawler, "~> 0.1.0"}]
+      [{:carousell_crawler, "https://github.com/seymores/carousell-crawler"}]
     end
     ```
 
