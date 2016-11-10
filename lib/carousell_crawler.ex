@@ -23,6 +23,10 @@ defmodule CarousellCrawler do
       |> Enum.into(%{})
   end
 
+  defp attribute_content(body, target) do
+    Floki.find(body, target) |> Floki.attribute("content") |> List.first
+  end
+
   def load_body(url) do
     headers = ["User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36"]
     HTTPotion.get(url, [headers: headers, follow_redirects: true]) |> Map.get(:body) |> Floki.parse
@@ -53,11 +57,21 @@ defmodule CarousellCrawler do
     Regex.scan(~r/window.App=(.*);/, script)
     |> List.first
     |> List.last
-    |> Poison.decode
+    |> Poison.decode!
   end
 
-  defp attribute_content(body, target) do
-    Floki.find(body, target) |> Floki.attribute("content") |> List.first
+  @doc """
+  Get the product map data from the parse script data.
+
+   ## Example
+
+    iex> data = CarousellCrawler.parse_for_script_data "https://carousell.com/p/62538322"
+    iex> CarousellCrawler.parse_product_store(data)
+
+  """
+  def parse_product_store(data) do
+    product_id = get_in(data, ["context", "dispatcher", "stores", "ProductStore", "_state", "product"])
+    get_in(data, ["context", "dispatcher", "stores", "ProductStore", "_state", "productsMap", "#{product_id}"])
   end
 
 end
