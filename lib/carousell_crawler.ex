@@ -32,6 +32,11 @@ defmodule CarousellCrawler do
     HTTPotion.get(url, [headers: headers, follow_redirects: true]) |> Map.get(:body) |> Floki.parse
   end
 
+  def product_data(url) do
+    data = parse_for_script_data(url) |> parse_product_store
+
+  end
+
   @doc """
   Parse Carousell item page using embeded script data used by the page react.js.
 
@@ -70,8 +75,12 @@ defmodule CarousellCrawler do
 
   """
   def parse_product_store(data) do
-    product_id = get_in(data, ["context", "dispatcher", "stores", "ProductStore", "_state", "product"])
-    get_in(data, ["context", "dispatcher", "stores", "ProductStore", "_state", "productsMap", "#{product_id}"])
+    # Logger.debug inspect(data)
+    product_id = get_in(data, ["context", "dispatcher", "stores", "ImmutableProductStore", "productListsMap", "PRODUCT"]) |> List.first
+    # product_id = get_in(data, ["context", "dispatcher", "stores", "ImmutableProductStore", "_state", "product"])
+    # get_in(data, ["context", "dispatcher", "stores", "ProductStore", "_state", "productsMap", "#{product_id}"])
+    # Logger.debug product_id
+    get_in(data, ["context", "dispatcher", "stores", "ImmutableProductStore", "productsMap", "#{product_id}"])
   end
 
 end
