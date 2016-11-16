@@ -34,6 +34,7 @@ defmodule CarousellCrawler do
 
   def product_data(url) do
     data = parse_for_script_data(url) |> parse_product_store
+    # basic_info = Map.take data, ["timeCreated", "description", "currency", "price", "sellerUsername"]
 
   end
 
@@ -80,7 +81,12 @@ defmodule CarousellCrawler do
     # product_id = get_in(data, ["context", "dispatcher", "stores", "ImmutableProductStore", "_state", "product"])
     # get_in(data, ["context", "dispatcher", "stores", "ProductStore", "_state", "productsMap", "#{product_id}"])
     # Logger.debug product_id
-    get_in(data, ["context", "dispatcher", "stores", "ImmutableProductStore", "productsMap", "#{product_id}"])
+    # category_id =
+    # get_in(data, ["context", "dispatcher", "stores", "CollectionStore", "collectionsMap", "7"])
+    product_data = get_in(data, ["context", "dispatcher", "stores", "ImmutableProductStore", "productsMap", "#{product_id}"])
+    category_id = product_data["collectionId"]
+    category_data = get_in(data, ["context", "dispatcher", "stores", "CollectionStore", "collectionsMap", "#{category_id}"])
+    Map.put(product_data, "category", category_data)
   end
 
 end
