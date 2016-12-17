@@ -82,4 +82,21 @@ defmodule CarousellCrawler.Parser do
     |> Poison.decode!
   end
 
+  defp filter_product_ids([""]), do: []
+  defp filter_product_ids(list), do: list
+
+  def parse_product_ids(script) do
+     dat = Regex.scan(~r/"productIds":\[(.*?)\]/, script, capture: :all_but_first)
+     result =
+     for l<-dat do
+       filter_product_ids(l)
+     end
+     List.flatten(result)
+  end
+
+  def parse_category_script(script) do
+    data = Regex.scan(~r/{"PRODUCTS_CATEGORY":\[(.*?)\]}/, script, capture: :all_but_first) |> List.flatten |> List.first
+    Regex.scan(~r/\d+/, data, capture: :first) |> List.flatten
+  end
+
 end
